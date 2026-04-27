@@ -1,0 +1,25 @@
+{
+  "name": "socialsafety",
+  "version": "1.0.0",
+  "description": "``` socialsafety/ ├── index.html          ← Open this in your browser ├── css/ │   └── main.css        ← All styles └── js/     ├── data.js         ← All mock data (alerts, teams, settings)     ├── charts.js       ← Chart.js chart initializations     ├── ui.js           ← DOM rendering helpers     └── app.js          ← Navigation, actions, live simulation ```",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
+
