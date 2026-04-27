@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+
 const DataContext = createContext();
 
 export const useData = () => useContext(DataContext);
@@ -12,7 +14,7 @@ export const DataProvider = ({ children }) => {
 
     const updateAlertStatus = async (alertId, newStatus) => {
         try {
-            const response = await fetch(`http://localhost:5001/api/alerts/${alertId}`, {
+            const response = await fetch(`${API_URL}/api/alerts/${alertId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
@@ -33,10 +35,10 @@ export const DataProvider = ({ children }) => {
         // 1. Fetch Initial Data
         const fetchData = async () => {
             try {
-                const alertsRes = await fetch('http://localhost:5001/api/alerts');
+                const alertsRes = await fetch(`${API_URL}/api/alerts`);
                 const alertsData = await alertsRes.json();
                 
-                const teamsRes = await fetch('http://localhost:5001/api/teams');
+                const teamsRes = await fetch(`${API_URL}/api/teams`);
                 const teamsData = await teamsRes.json();
 
                 setAlerts(Array.isArray(alertsData) ? alertsData : []);
@@ -53,7 +55,7 @@ export const DataProvider = ({ children }) => {
         // 2. Setup Socket.io connection (resilient - won't crash if backend is offline)
         let socket;
         try {
-            socket = io('http://localhost:5001', { reconnectionAttempts: 3, timeout: 5000 });
+            socket = io(API_URL, { reconnectionAttempts: 3, timeout: 5000 });
             socket.on('connect_error', (err) => console.warn('Socket connect error:', err.message));
             socket.on('newAlert', (newAlert) => {
                 setAlerts(prevAlerts => [newAlert, ...prevAlerts]);
