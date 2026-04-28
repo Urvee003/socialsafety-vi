@@ -58,8 +58,11 @@ export const DataProvider = ({ children }) => {
             socket = io(API_URL, { reconnectionAttempts: 3, timeout: 5000 });
             socket.on('connect_error', (err) => console.warn('Socket connect error:', err.message));
             socket.on('newAlert', (newAlert) => {
-                setAlerts(prevAlerts => [newAlert, ...prevAlerts]);
-            });
+    setAlerts(prevAlerts => {
+        const updatedList = [newAlert, ...prevAlerts];
+        return updatedList.slice(0, 30); // Always keep only the 30 most recent
+    });
+});
         } catch (err) {
             console.warn('Socket.io failed to initialize:', err);
         }
