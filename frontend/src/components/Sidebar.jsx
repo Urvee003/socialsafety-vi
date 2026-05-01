@@ -13,19 +13,19 @@ import {
 
 const Sidebar = () => {
     const navItems = [
-        { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
+        { path: '/', icon: LayoutDashboard, label: 'Dashboard' },            //This makes sidebar dynamic, links the pages
         { path: '/alerts', icon: AlertTriangle, label: 'Alert Stream' },
-        { path: '/map', icon: MapIcon, label: 'Map View' },
+        { path: '/map', icon: MapIcon, label: 'Map View' }, 
         { path: '/teams', icon: Users, label: 'Response Teams' },
         { path: '/analytics', icon: BarChart3, label: 'Analytics' },
         { path: '/settings', icon: Settings, label: 'Settings' },
     ];
 
-    return (
+    return (                                     //displays app name
         <aside className="sidebar">
             <div className="sidebar-logo">
-                <Shield size={32} color="var(--accent-primary)" />
-                <span>SafetyHub</span>
+                <Shield size={32} color="var(--accent-primary)" />  
+                <span>SocialSafety</span>                               
             </div>
 
             <nav className="sidebar-nav">
@@ -54,4 +54,4 @@ const Sidebar = () => {
     );
 };
 
-export default Sidebar;
+export default Sidebar;        //Makes this component usable in other files
