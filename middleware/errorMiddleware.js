@@ -1,8 +1,8 @@
-// middleware/errorMiddleware.js
+// middleware/errorMiddleware.js---Express does it automatically by:Comparing URL, Comparing HTTP method
 const notFound = (req, res, next) => {
-  const error = new Error(`Not Found - ${req.originalUrl}`);
+  const error = new Error(`Not Found - ${req.originalUrl}`);      //Makes a custom error message
   res.status(404);
-  next(error);
+  next(error);                                                    //Passes error to next middleware (errorHandler)
 };
 
 const errorHandler = (err, req, res, next) => {
@@ -14,4 +14,4 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-module.exports = { notFound, errorHandler };
+module.exports = { notFound, errorHandler };                     //Makes both functions usable in your main server file
