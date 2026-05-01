@@ -1,48 +1,48 @@
-import os
-import random
-import requests
-from flask import Flask, jsonify, request
-from flask_cors import CORS
-from flask_socketio import SocketIO
-from dotenv import load_dotenv
+import os            #access environment variables
+import random            #generate random alerts
+import requests                                  #call external APIs
+from flask import Flask, jsonify, request        #send JSON responses
+from flask_cors import CORS                    #allow frontend to talk to backend
+from flask_socketio import SocketIO            #real-time communication
+from dotenv import load_dotenv                    #load .env file
 
 load_dotenv()
 
-app = Flask(__name__)
-CORS(app)
+app = Flask(__name__)                            #backend server
+CORS(app)                                        #allows frontend (React) to call backend
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # Supabase Config
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_URL = os.environ.get("SUPABASE_URL")        #Gets credentials
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-HEADERS = {
+HEADERS = {                                          #headers are required to talk to Supabase API
     "apikey": SUPABASE_KEY,
     "Authorization": f"Bearer {SUPABASE_KEY}",
     "Content-Type": "application/json",
     "Prefer": "return=representation"
 }
 
-@app.route('/api/alerts', methods=['GET'])
+@app.route('/api/alerts', methods=['GET'])           #Fetch all alerts from database
 def get_alerts():
     try:
         # Direct REST API call to Supabase
         url = f"{SUPABASE_URL}/rest/v1/alerts?select=*&order=created_at.desc"
-        res = requests.get(url, headers=HEADERS)
-        return jsonify(res.json())
+        res = requests.get(url, headers=HEADERS)        #Calls Supabase rest api, gets alerts sorted by latest first
+        return jsonify(res.json())                      #Sends data to frontend
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/alerts/<int:alert_id>', methods=['PATCH'])
+@app.route('/api/alerts/<int:alert_id>', methods=['PATCH'])    #Update a specific alert
 def update_alert(alert_id):
     try:
-        data = request.json
-        url = f"{SUPABASE_URL}/rest/v1/alerts?id=eq.{alert_id}"
+        data = request.json                             #Gets data from frontend
+        url = f"{SUPABASE_URL}/rest/v1/alerts?id=eq.{alert_id}"       #Updates alert in database
         res = requests.patch(url, headers=HEADERS, json=data)
         return jsonify({"status": "success"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/alerts/reset', methods=['DELETE'])
+@app.route('/api/alerts/reset', methods=['DELETE'])           #Delete ALL alerts
 def reset_alerts():
     """Delete ALL alerts from Supabase — use to start fresh."""
     try:
@@ -53,7 +53,7 @@ def reset_alerts():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/teams', methods=['GET'])
+@app.route('/api/teams', methods=['GET'])                    #Fetch response teams
 def get_teams():
     try:
         url = f"{SUPABASE_URL}/rest/v1/response_teams?select=*"
@@ -62,7 +62,7 @@ def get_teams():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-def simulator():
+def simulator():                                            #Automatically creates fake alerts every 45 seconds
     print("Simulator Started...")
     while True:
         socketio.sleep(45)   # ⬆ Was 10s — now fires every 45 seconds
@@ -93,7 +93,7 @@ def simulator():
                 headers=HEADERS
             )
             all_ids = [row["id"] for row in count_res.json() if isinstance(count_res.json(), list)]
-            if len(all_ids) >= 30:
+            if len(all_ids) >= 30:                       #If more than 30 alerts, delete oldest one
                 oldest_id = all_ids[0]
                 requests.delete(
                     f"{SUPABASE_URL}/rest/v1/alerts?id=eq.{oldest_id}",
@@ -103,7 +103,7 @@ def simulator():
 
             # Post new alert
             url = f"{SUPABASE_URL}/rest/v1/alerts"
-            res = requests.post(url, headers=HEADERS, json=new_alert)
+            res = requests.post(url, headers=HEADERS, json=new_alert)    #Save alert to database
 
             if res.status_code == 201 and res.text:
                 data_list = res.json()
